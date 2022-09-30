@@ -2,10 +2,7 @@
 pragma solidity 0.8.0;
 
 contract GasContract {
-    uint256 immutable tradeFlag = 1;
-    //uint256 immutable basicFlag = 0;
-    uint256 immutable dividendFlag = 1;
-    uint256 public totalSupply; // cannot be updated
+    uint256 public immutable totalSupply; // cannot be updated
     uint256 private paymentCounter;
     uint256 private tradePercent = 12;
     uint256 private tradeMode;
@@ -16,6 +13,7 @@ contract GasContract {
     mapping(address => Payment[]) private payments;
     mapping(address => uint256) public whitelist;
     mapping(address => uint256) private isOddWhitelistUser;
+    mapping(address => bool) public isAdmin;
 
     address public contractOwner;
     address[5] public administrators;
@@ -38,7 +36,7 @@ contract GasContract {
         uint256 paymentID;
         uint256 amount;
         bool adminUpdated;
-        string recipientName; // max 8 characters
+        bytes32 recipientName; // max 8 characters
         address recipient;
         address admin; // administrators address
     }
@@ -48,6 +46,8 @@ contract GasContract {
         uint256 blockNumber;
         address updatedBy;
     }
+
+    // Put back important struct 
 
     event AddedToWhitelist(address userAddress, uint256 tier);
 
@@ -77,29 +77,15 @@ contract GasContract {
         address admin,
         uint256 ID,
         uint256 amount,
-        string recipient
+        bytes32 recipient
     );
     event WhiteListTransfer(address indexed);
 
-    constructor(address[] memory _admins, uint256 _totalSupply) {
+    constructor(address[5] memory _admins, uint256 _totalSupply) {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
-
-        for (uint256 ii = 0; ii < administrators.length; ii++) {
-            require(_admins[ii] != address(0));
-
-            administrators[ii] = _admins[ii];
-            if (_admins[ii] == contractOwner) {
-                balances[contractOwner] = totalSupply;
-            } else {
-                balances[_admins[ii]] = 0;
-            }
-            if (_admins[ii] == contractOwner) {
-                emit supplyChanged(_admins[ii], totalSupply);
-            } else if (_admins[ii] != contractOwner) {
-                emit supplyChanged(_admins[ii], 0);
-            }
-        }
+        administrators = _admins;
+        balances[contractOwner] = _totalSupply;
     }
 
     function getPaymentHistory()
@@ -110,7 +96,7 @@ contract GasContract {
         return paymentHistory;
     }
 
-    // Should use a mapping that gets initialized on deployement  
+    // Should use a mapping that gets initialized on deployement
     function checkForAdmin(address _user) public view returns (bool admin_) {
         bool admin = false;
         for (uint256 ii = 0; ii < administrators.length; ii++) {
@@ -125,13 +111,9 @@ contract GasContract {
         return balances[_user];
     }
 
-    // TradeFlag and dividendFlag should be booleans 
+    // TradeFlag and dividendFlag should be bool
     function getTradingMode() public pure returns (bool) {
-        if (tradeFlag == 1 || dividendFlag == 1) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     function addHistory(address _updateAddress, bool _tradeMode)
@@ -165,15 +147,11 @@ contract GasContract {
     function transfer(
         address _recipient,
         uint256 _amount,
-        string calldata _name
+        bytes32 _name
     ) public returns (bool status_) {
         require(
             balances[msg.sender] >= _amount,
             "Gas Contract - Transfer function - Sender has insufficient Balance"
-        );
-        require(
-            bytes(_name).length < 9,
-            "Gas Contract - Transfer function -  The recipient name is too long, there is a max length of 8 characters"
         );
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
@@ -263,10 +241,10 @@ contract GasContract {
         emit AddedToWhitelist(_userAddrs, _tier);
     }
 
-    function whiteTransfer(
-        address _recipient,
-        uint256 _amount
-    ) public checkIfWhiteListed(msg.sender) {
+    function whiteTransfer(address _recipient, uint256 _amount)
+        public
+        checkIfWhiteListed(msg.sender)
+    {
         require(
             balances[msg.sender] >= _amount,
             "Gas Contract - whiteTransfers function - Sender has insufficient Balance"
@@ -279,7 +257,6 @@ contract GasContract {
         balances[_recipient] += _amount;
         balances[msg.sender] += whitelist[msg.sender];
         balances[_recipient] -= whitelist[msg.sender];
-
 
         emit WhiteListTransfer(_recipient);
     }

@@ -42,7 +42,7 @@ describe("Gas1", function () {
   it("Checks a transfer", async function () {
     // owner has total supply, transfer 100
 
-    const transferTx = await gasContract.transfer(addr1.address, 100, "acc1");
+    const transferTx = await gasContract.transfer(addr1.address, 100, ethers.utils.formatBytes32String("acc1"));
     await transferTx.wait();
     let acc1Balance = await gasContract.balanceOf(addr1.address);
     expect(acc1Balance).to.equal(100);
@@ -50,16 +50,17 @@ describe("Gas1", function () {
 
   it("Checks an update", async function () {
     // create a transfer then update
-
-    const transferTx1 = await gasContract.transfer(addr1.address, 300, "acc1");
+    let bytes =  ethers.utils.formatBytes32String("acc1");
+    console.log(bytes);
+    const transferTx1 = await gasContract.transfer(addr1.address, 300, bytes);
     await transferTx1.wait();
-    const transferTx2 = await gasContract.transfer(addr1.address, 200, "acc1");
+    const transferTx2 = await gasContract.transfer(addr1.address, 200, ethers.utils.formatBytes32String("acc1"));
     await transferTx2.wait();
-    const transferTx3 = await gasContract.transfer(addr1.address, 100, "acc1");
+    const transferTx3 = await gasContract.transfer(addr1.address, 100, ethers.utils.formatBytes32String("acc1"));
     await transferTx3.wait();
-    const transferTx4 = await gasContract.transfer(addr2.address, 300, "acc2");
+    const transferTx4 = await gasContract.transfer(addr2.address, 300, ethers.utils.formatBytes32String("acc2"));
     await transferTx4.wait();
-    const transferTx5 = await gasContract.transfer(addr2.address, 100, "acc2");
+    const transferTx5 = await gasContract.transfer(addr2.address, 100, ethers.utils.formatBytes32String("acc2"));
     await transferTx5.wait();
     let acc1Balance = await gasContract.balanceOf(addr1.address);
     expect(acc1Balance).to.equal(600);
@@ -77,7 +78,7 @@ describe("Gas1", function () {
 
   it("Checks for events", async function () {
     // create a transfer then update
-    await expect(gasContract.transfer(addr1.address, 300, "acc1"))
+    await expect(gasContract.transfer(addr1.address, 300, ethers.utils.formatBytes32String("acc2")))
       .to.emit(gasContract, "Transfer")
       .withArgs(addr1.address, 300);
   });
@@ -93,6 +94,7 @@ describe("Gas1", function () {
   });
 
   //CAN BE adjusted to a level
+  // Merkle Tree and proofs
   it("Add users to whitelist and validate key users are added with correct tier", async function () {
     await addToWhitelist();
     let whitelistAddr1 = await gasContract.whitelist(addr1.address);
@@ -104,11 +106,12 @@ describe("Gas1", function () {
   });
   it("Whitelist transfer works", async function () {
     await addToWhitelist();
-    const transferTx1 = await gasContract.transfer(addr1.address, 500, "acc1");
+    const transferTx1 = await gasContract.transfer(addr1.address, 500, ethers.utils.formatBytes32String("acc1"));
     await transferTx1.wait();
-    const transferTx2 = await gasContract.transfer(addr2.address, 300, "acc2");
+    // As the bytes32
+    const transferTx2 = await gasContract.transfer(addr2.address, 300, ethers.utils.formatBytes32String("acc2"));
     await transferTx2.wait();
-    const transferTx3 = await gasContract.transfer(addr3.address, 100, "acc2");
+    const transferTx3 = await gasContract.transfer(addr3.address, 100, ethers.utils.formatBytes32String("acc2"));
     await transferTx3.wait();
     let recipient1 = ethers.Wallet.createRandom();
     let recipient2 = ethers.Wallet.createRandom();
