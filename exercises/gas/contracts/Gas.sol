@@ -36,7 +36,7 @@ contract GasContract {
         uint256 paymentID;
         uint256 amount;
         bool adminUpdated;
-        bytes32 recipientName; // max 8 characters
+        string recipientName; // max 8 characters
         address recipient;
         address admin; // administrators address
     }
@@ -77,7 +77,7 @@ contract GasContract {
         address admin,
         uint256 ID,
         uint256 amount,
-        bytes32 recipient
+        string recipient
     );
     event WhiteListTransfer(address indexed);
 
@@ -85,7 +85,7 @@ contract GasContract {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
         administrators = _admins;
-        balances[contractOwner] = _totalSupply;
+        balances[contractOwner] = _totalSupply;    
     }
 
     function getPaymentHistory()
@@ -97,14 +97,14 @@ contract GasContract {
     }
 
     // Should use a mapping that gets initialized on deployement
-    function checkForAdmin(address _user) public view returns (bool admin_) {
-        bool admin = false;
-        for (uint256 ii = 0; ii < administrators.length; ii++) {
-            if (administrators[ii] == _user) {
-                admin = true;
+    function checkForAdmin(address _user) public view returns (bool) {
+        uint256 ii;
+        address[5] memory administratorsTemp = administrators;
+        for (ii; ii < 5; ii++) {
+            if (administratorsTemp[ii] == _user) {
+                return true;
             }
         }
-        return admin;
     }
 
     function balanceOf(address _user) public view returns (uint256 balance_) {
@@ -147,11 +147,15 @@ contract GasContract {
     function transfer(
         address _recipient,
         uint256 _amount,
-        bytes32 _name
+        string memory _name
     ) public returns (bool status_) {
         require(
             balances[msg.sender] >= _amount,
             "Gas Contract - Transfer function - Sender has insufficient Balance"
+        );
+        require(
+            bytes(_name).length < 9,
+            "Gas Contract - Transfer function -  The recipient name is too long, there is a max length of 8 characters"
         );
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
