@@ -9,13 +9,13 @@ contract GasContract {
     uint256 private paymentCounter;
     uint256 private tradePercent = 12;
     uint256 private tradeMode;
+    // Should be boolean?
     uint256 wasLastOdd = 1;
 
-    mapping(address => uint256) public balances;
-    mapping(address => Payment[]) public payments;
+    mapping(address => uint256) private balances;
+    mapping(address => Payment[]) private payments;
     mapping(address => uint256) public whitelist;
-    mapping(address => ImportantStruct) public whiteListStruct;
-    mapping(address => uint256) public isOddWhitelistUser;
+    mapping(address => uint256) private isOddWhitelistUser;
 
     address public contractOwner;
     address[5] public administrators;
@@ -23,7 +23,7 @@ contract GasContract {
     bool public isReady = false;
 
     PaymentType constant defaultPayment = PaymentType.Unknown;
-    History[] public paymentHistory; // when a payment was updated
+    History[] private paymentHistory; // when a payment was updated
 
     enum PaymentType {
         Unknown,
@@ -47,12 +47,6 @@ contract GasContract {
         uint256 lastUpdate;
         uint256 blockNumber;
         address updatedBy;
-    }
-
-    struct ImportantStruct {
-        uint256 valueA; // max 3 digits
-        uint256 valueB; // max 3 digits
-        uint256 bigValue;
     }
 
     event AddedToWhitelist(address userAddress, uint256 tier);
@@ -93,6 +87,7 @@ contract GasContract {
 
         for (uint256 ii = 0; ii < administrators.length; ii++) {
             require(_admins[ii] != address(0));
+
             administrators[ii] = _admins[ii];
             if (_admins[ii] == contractOwner) {
                 balances[contractOwner] = totalSupply;
@@ -115,6 +110,7 @@ contract GasContract {
         return paymentHistory;
     }
 
+    // Should use a mapping that gets initialized on deployement  
     function checkForAdmin(address _user) public view returns (bool admin_) {
         bool admin = false;
         for (uint256 ii = 0; ii < administrators.length; ii++) {
@@ -126,11 +122,11 @@ contract GasContract {
     }
 
     function balanceOf(address _user) public view returns (uint256 balance_) {
-        uint256 balance = balances[_user];
-        return balance;
+        return balances[_user];
     }
 
-    function getTradingMode() public pure returns (bool mode_) {
+    // TradeFlag and dividendFlag should be booleans 
+    function getTradingMode() public pure returns (bool) {
         if (tradeFlag == 1 || dividendFlag == 1) {
             return true;
         } else {
@@ -269,8 +265,7 @@ contract GasContract {
 
     function whiteTransfer(
         address _recipient,
-        uint256 _amount,
-        ImportantStruct memory _struct
+        uint256 _amount
     ) public checkIfWhiteListed(msg.sender) {
         require(
             balances[msg.sender] >= _amount,
@@ -285,12 +280,7 @@ contract GasContract {
         balances[msg.sender] += whitelist[msg.sender];
         balances[_recipient] -= whitelist[msg.sender];
 
-        whiteListStruct[msg.sender] = ImportantStruct(0, 0, 0);
-        // Storage or memory ?
-        ImportantStruct memory newImportantStruct = whiteListStruct[msg.sender];
-        newImportantStruct.valueA = _struct.valueA;
-        newImportantStruct.bigValue = _struct.bigValue;
-        newImportantStruct.valueB = _struct.valueB;
+
         emit WhiteListTransfer(_recipient);
     }
 }
