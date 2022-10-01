@@ -7520,10 +7520,10 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-sol2uml@^2.1.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/sol2uml/-/sol2uml-2.2.2.tgz#79ce9da4facdfe87f527d7e71ce0ed5c2a7fe65b"
-  integrity sha512-xVzVKgkxMoCjOuT895ouAaU6mbGsd1qo2eI8bw16RE5gUdK8N/gsdZsJZSUyihgo4KwLHPvKRXwVBFOCJUFuRg==
+sol2uml@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/sol2uml/-/sol2uml-2.2.3.tgz#55888b83987da31383ca640bbc691331fff1c4e9"
+  integrity sha512-W9PCN8Vrkdke5cpsMWJgP1K+R08LHB7rmdnDA8MQE92W43fnwXB2tThaJecQGAhYHqH/hfO84bMFFJM1ndXCQQ==
   dependencies:
     "@aduh95/viz.js" "^3.7.0"
     "@solidity-parser/parser" "^0.14.3"

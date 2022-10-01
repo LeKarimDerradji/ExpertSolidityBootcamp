@@ -3,25 +3,15 @@ pragma solidity 0.8.0;
 
 contract GasContract {
     uint256 public immutable totalSupply; // cannot be updated
+    uint256 private immutable tradePercent;
     uint256 private paymentCounter;
-    uint256 private tradePercent = 12;
-    uint256 private tradeMode;
-    // Should be boolean?
-    uint256 wasLastOdd = 1;
-
+    
     mapping(address => uint256) private balances;
     mapping(address => Payment[]) private payments;
     mapping(address => uint256) public whitelist;
-    mapping(address => uint256) private isOddWhitelistUser;
-    mapping(address => bool) public isAdmin;
-
     address public contractOwner;
     address[5] public administrators;
-
-    bool public isReady = false;
-
     PaymentType constant defaultPayment = PaymentType.Unknown;
-    History[] private paymentHistory; // when a payment was updated
 
     enum PaymentType {
         Unknown,
@@ -85,15 +75,8 @@ contract GasContract {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
         administrators = _admins;
-        balances[contractOwner] = _totalSupply;    
-    }
-
-    function getPaymentHistory()
-        public
-        payable
-        returns (History[] memory paymentHistory_)
-    {
-        return paymentHistory;
+        balances[contractOwner] = _totalSupply;  
+        tradePercent = 12;  
     }
 
     // Should use a mapping that gets initialized on deployement
@@ -116,7 +99,7 @@ contract GasContract {
         return true;
     }
 
-    function addHistory(address _updateAddress, bool _tradeMode)
+    function addHistory(address _updateAddress)
         public
         returns (bool status_, bool tradeMode_)
     {
@@ -124,12 +107,11 @@ contract GasContract {
         history.blockNumber = block.number;
         history.lastUpdate = block.timestamp;
         history.updatedBy = _updateAddress;
-        paymentHistory.push(history);
         bool[] memory status = new bool[](tradePercent);
         for (uint256 i = 0; i < tradePercent; i++) {
             status[i] = true;
         }
-        return ((status[0] == true), _tradeMode);
+        return ((status[0] == true), true);
     }
 
     function getPayments(address _user)
@@ -202,7 +184,7 @@ contract GasContract {
                 payments[_user][i].paymentType = _type;
                 payments[_user][i].amount = _amount;
                 //bool tradingMode = getTradingMode();
-                addHistory(_user, getTradingMode());
+                addHistory(_user);
                 emit PaymentUpdated(
                     msg.sender,
                     _ID,
@@ -231,16 +213,6 @@ contract GasContract {
         } else if (_tier > 0 && _tier < 3) {
             whitelist[_userAddrs] -= _tier;
             whitelist[_userAddrs] = 2;
-        }
-        uint256 wasLastAddedOdd = wasLastOdd;
-        if (wasLastAddedOdd == 1) {
-            wasLastOdd = 0;
-            isOddWhitelistUser[_userAddrs] = wasLastAddedOdd;
-        } else if (wasLastAddedOdd == 0) {
-            wasLastOdd = 1;
-            isOddWhitelistUser[_userAddrs] = wasLastAddedOdd;
-        } else {
-            revert("Contract hacked, imposible, call help");
         }
         emit AddedToWhitelist(_userAddrs, _tier);
     }
