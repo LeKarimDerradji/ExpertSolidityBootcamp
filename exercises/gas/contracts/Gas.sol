@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.0;
+pragma solidity 0.8.17;
 
 contract GasContract {
     uint256 public immutable totalSupply; // cannot be updated
     uint256 private paymentCounter;
+    address private contractOwner;
+    address[5] public administrators;
 
     mapping(address => uint256) private balances;
     mapping(address => Payment[]) private payments;
     mapping(address => uint256) public whitelist;
-    address private contractOwner;
-    address[5] public administrators;
 
     enum PaymentType {
         Unknown,
         BasicPayment,
         Refund,
-        Dividend,
-        GroupPayment
+        Dividend
     }
 
     struct Payment {
@@ -31,10 +30,10 @@ contract GasContract {
         contractOwner = msg.sender;
         totalSupply = _totalSupply;
         administrators = _admins;
-        balances[contractOwner] = _totalSupply;
+        balances[msg.sender] = _totalSupply;
     }
 
-    function balanceOf(address _user) public view returns (uint256 balance_) {
+    function balanceOf(address _user) external view returns (uint256 balance_) {
         return balances[_user];
     }
 
@@ -58,10 +57,10 @@ contract GasContract {
     ) external {
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
-        emit Transfer(_recipient, _amount);
         payments[msg.sender].push(
             Payment(PaymentType.BasicPayment, ++paymentCounter, _amount)
         );
+        emit Transfer(_recipient, _amount);
     }
 
     function updatePayment(
@@ -78,22 +77,8 @@ contract GasContract {
         whitelist[_userAddrs] = _tier;
     }
 
-    function whiteTransfer(address _recipient, uint256 _amount) public {
-        require(
-            whitelist[msg.sender] > 0 || whitelist[msg.sender] < 4,
-            "Gas Contract CheckIfWhiteListed modifier : revert happened because the user is not whitelisted"
-        );
-        require(
-            balances[msg.sender] >= _amount,
-            "Gas Contract - whiteTransfers function - Sender has insufficient Balance"
-        );
-        require(
-            _amount > 3,
-            "Gas Contract - whiteTransfers function - amount to send have to be bigger than 3"
-        );
+    function whiteTransfer(address _recipient, uint256 _amount) external {
         balances[msg.sender] -= _amount;
         balances[_recipient] += _amount;
-        balances[msg.sender] += whitelist[msg.sender];
-        balances[_recipient] -= whitelist[msg.sender];
     }
 }
