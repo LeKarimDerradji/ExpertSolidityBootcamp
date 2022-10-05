@@ -8,7 +8,7 @@ contract GasContract {
 
     mapping(address => uint256) private balances;
     mapping(address => Payment[]) private payments;
-    mapping(address => uint256) private whitelist;
+    mapping(address => uint256) public whitelist;
     address private contractOwner;
     address[5] public administrators;
 
@@ -60,7 +60,6 @@ contract GasContract {
     function balanceOf(address _user) public view returns (uint256 balance_) {
         return balances[_user];
     }
-
     // TradeFlag and dividendFlag should be bool
     function getTradingMode() external pure returns (bool) {
         return true;
@@ -83,7 +82,7 @@ contract GasContract {
     }
 
     function getPayments(address _user)
-        public
+        internal
         view
         returns (Payment[] memory payments_)
     {
@@ -117,17 +116,17 @@ contract GasContract {
         uint256 _amount,
         PaymentType _type
     ) external {
-        payments[_user].paymentID == _ID;
-        payments[_user].adminUpdated = true;
-        payments[_user].admin = _user;
-        payments[_user].paymentType = _type;
-        payments[_user].amount = _amount;
+        //payment[_user].paymentID = _ID;
+        payments[_user][_ID].adminUpdated = true;
+        payments[_user][_ID].admin = _user;
+        payments[_user][_ID].paymentType = _type;
+        payments[_user][_ID].amount = _amount;
         addHistory(_user);
         emit PaymentUpdated(
             msg.sender,
             _ID,
             _amount,
-            payments[_user].recipientName
+            payments[_user][_ID].recipientName
         );
     }
 
