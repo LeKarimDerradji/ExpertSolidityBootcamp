@@ -1,0 +1,3 @@
+[submodule "exercises/audit/lib/solmate"]
+	path = exercises/audit/lib/solmate
+	url = https://github.com/transmissions11/solmate
