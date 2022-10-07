@@ -1,6 +1,6 @@
 [submodule "exercises/audit/lib/solmate"]
 	path = exercises/audit/lib/solmate
-	url = https://github.com/transmission/solmate
+	url = https://github.com/transmissions11/solmate
 [submodule "exercises/audit/lib/forge-std"]
 	path = exercises/audit/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
