@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+pragma solidity ^0.8.7;
 
-contract DogCoinGame is ERC20 {
+contract DogCoinGame  {
     uint256 public currentPrize;
     uint256 public numberPlayers;
     address payable[] public players;
     address payable[] public winners;
 
     event startPayout();
-
-    constructor() ERC20("DogCoin", "DOG") {}
 
     function addPlayer(address payable _player) public payable {
         if (msg.value == 1) {
