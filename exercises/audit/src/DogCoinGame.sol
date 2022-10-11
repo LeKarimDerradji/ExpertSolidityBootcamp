@@ -29,7 +29,12 @@ contract DogCoinGame  {
             payWinners(amountToPay);
         }
     }
-
+     /**
+     *@notice
+     * DogCoinGame.payWinners(uint256) (src/DogCoinGame.sol#33-37) sends eth to arbitrary user
+     * Dangerous calls:
+     *  - winners[i].send(_amount) (
+     */
     function payWinners(uint256 _amount) public {
         for (uint256 i = 0; i <= winners.length; i++) {
             winners[i].send(_amount);
