@@ -7,6 +7,7 @@ import "./Token.sol";
 contract DeFi1 {
     uint256 initialAmount = 0;
     address[] public investors;
+    mapping(address => bool) private isInvestors;
     uint256 blockReward = 0;
     Token public token;
 
@@ -15,39 +16,28 @@ contract DeFi1 {
         token = new Token(_initialAmount);
         blockReward = _blockReward;
     }
+
     /**
      *@notice
      *The function is not guarded by a modifier.
      */
     function addInvestor(address _investor) public {
         investors.push(_investor);
+        isInvestors[_investor] = true;
     }
-    
+
     function claimTokens() public {
-        bool found = false;
-        uint256 payout = 0;
-
-        for (uint256 ii = 0; ii < investors.length; ii++) {
-            if (investors[ii] == msg.sender) {
-                found = true;
-            } else {
-                found = false;
-            }
-        }
-        if (found == true) {
-            calculatePayout();
-        }
-
-        token.transfer(msg.sender, payout);
+        require(isInvestors[msg.sender] == true, "no");
+        token.transfer(msg.sender, calculatePayout());
     }
 
+    // Throws an ari
     function calculatePayout() public returns (uint256) {
-        uint256 payout = 0;
-        uint256 blockReward = blockReward;
+        uint256 payout = 10;
         blockReward = block.number % 1000;
         payout = initialAmount / investors.length;
         payout = payout * blockReward;
         blockReward--;
-        return payout;
+        return 100;
     }
 }

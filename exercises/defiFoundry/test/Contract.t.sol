@@ -22,7 +22,7 @@ contract ContractTest is Test {
 
     function setUp() public {
         defi = new DeFi1(initialAmount, blockReward);
-        // Token was not set propelly
+        // Token was not set propelly before : defi.token.address was passed as the abstraction's parameter
         token = Token(defi.token());
         alice = new User();
         bob = new User();
@@ -39,15 +39,14 @@ contract ContractTest is Test {
     }
 
     function testClaim() public {
-        token.balanceOf(address(defi));
-        defi.addInvestor(address(alice));
         defi.addInvestor(address(bob));
+        defi.addInvestor(address(alice));
+        defi.addInvestor(address(chloe));
         vm.prank(address(alice));
-        vm.roll(1);
         // emit Transfer(_from: DeFi1: [0xCe71065D4017F316EC606Fe4422e11eB2c47c246], 
         //_to: User: [0x185a4dc360CE69bDCceE33b3784B0282f7961aea], _value: 0)
         defi.claimTokens();
-
+        token.balanceOf(address(alice));
     }
 
     function testCorrectPayoutAmount() public {
