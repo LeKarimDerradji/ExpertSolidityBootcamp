@@ -31,13 +31,13 @@ contract DeFi1 {
         token.transfer(msg.sender, calculatePayout());
     }
 
-    // Throws an ari
+    // Returns 0
     function calculatePayout() public returns (uint256) {
         uint256 payout = 10;
         blockReward = block.number % 1000;
         payout = initialAmount / investors.length;
         payout = payout * blockReward;
         blockReward--;
-        return 100;
+        return payout;
     }
 }

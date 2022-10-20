@@ -43,8 +43,6 @@ contract ContractTest is Test {
         defi.addInvestor(address(alice));
         defi.addInvestor(address(chloe));
         vm.prank(address(alice));
-        // emit Transfer(_from: DeFi1: [0xCe71065D4017F316EC606Fe4422e11eB2c47c246], 
-        //_to: User: [0x185a4dc360CE69bDCceE33b3784B0282f7961aea], _value: 0)
         defi.claimTokens();
         token.balanceOf(address(alice));
     }
