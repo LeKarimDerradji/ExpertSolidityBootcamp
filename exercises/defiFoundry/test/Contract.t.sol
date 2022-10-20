@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Vm.sol";
 import "forge-std/Test.sol";
-import "forge-std/console.sol";
+import {console} from "forge-std/console.sol";
 import "../src/DeFi1.sol";
 import "../src/Token.sol";
 
@@ -22,10 +22,11 @@ contract ContractTest is Test {
 
     function setUp() public {
         defi = new DeFi1(initialAmount, blockReward);
-        token = Token(defi.token.address);
+        token = Token(defi.token());
         alice = new User();
         bob = new User();
         chloe = new User();
+        //console.log(address(token));
     }
 
     function testInitialBalance() public {
@@ -38,13 +39,14 @@ contract ContractTest is Test {
     }
 
     function testClaim() public {
+        token.balanceOf(address(defi));
         defi.addInvestor(address(alice));
         defi.addInvestor(address(bob));
         vm.prank(address(alice));
         vm.roll(1);
         defi.claimTokens();
-    }
 
+    }
 
     function testCorrectPayoutAmount() public {
 

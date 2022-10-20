@@ -15,11 +15,14 @@ contract DeFi1 {
         token = new Token(_initialAmount);
         blockReward = _blockReward;
     }
-
+    /**
+     *@notice
+     *The function is not guarded by a modifier.
+     */
     function addInvestor(address _investor) public {
         investors.push(_investor);
     }
-
+    
     function claimTokens() public {
         bool found = false;
         uint256 payout = 0;
