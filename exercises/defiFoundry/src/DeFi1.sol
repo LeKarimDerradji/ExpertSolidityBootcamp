@@ -5,14 +5,18 @@ pragma solidity ^0.8.13;
 import "./Token.sol";
 
 contract DeFi1 {
-    uint256 initialAmount = 0;
+    uint256 initialAmount;
     address[] public investors;
     mapping(address => bool) private isInvestors;
     uint256 blockReward = 0;
     Token public token;
-
+     /**
+     *@dev 
+     * Badly coded constructor
+     */
     constructor(uint256 _initialAmount, uint256 _blockReward) {
-        initialAmount = initialAmount;
+        // Initial amount was never initialized : before initialAmount = _initialAmount
+        initialAmount = _initialAmount;
         token = new Token(_initialAmount);
         blockReward = _blockReward;
     }
@@ -33,7 +37,7 @@ contract DeFi1 {
 
     // Returns 0
     function calculatePayout() public returns (uint256) {
-        uint256 payout = 10;
+        uint256 payout;
         blockReward = block.number % 1000;
         payout = initialAmount / investors.length;
         payout = payout * blockReward;

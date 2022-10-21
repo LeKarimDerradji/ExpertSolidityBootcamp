@@ -42,6 +42,7 @@ contract ContractTest is Test {
         defi.addInvestor(address(bob));
         defi.addInvestor(address(alice));
         defi.addInvestor(address(chloe));
+        console.log(defi.calculatePayout());
         vm.prank(address(alice));
         defi.claimTokens();
         token.balanceOf(address(alice));
