@@ -45,7 +45,10 @@ contract ContractTest is Test {
         console.log(defi.calculatePayout());
         vm.prank(address(alice));
         defi.claimTokens();
-        token.balanceOf(address(alice));
+        vm.roll(2);
+        vm.prank(address(alice));
+        defi.claimTokens();
+
     }
 
     function testCorrectPayoutAmount() public {

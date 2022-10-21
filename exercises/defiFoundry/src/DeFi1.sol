@@ -35,12 +35,17 @@ contract DeFi1 {
         token.transfer(msg.sender, calculatePayout());
     }
 
-    // Returns 0
+     /**
+     * This function should have a require, so that users can claim each 1000 blocks
+     * The ammount should decrease each 1000 blocks.
+     * A limit should be imposed on the number of token you can claim. 
+     * Here's, all the tokens can be drained. 
+     */
     function calculatePayout() public returns (uint256) {
         uint256 payout;
         blockReward = block.number % 1000;
         payout = initialAmount / investors.length;
-        payout = payout * blockReward;
+        payout = payout - blockReward;
         blockReward--;
         return payout;
     }
